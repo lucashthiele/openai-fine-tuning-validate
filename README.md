@@ -60,6 +60,14 @@ poetry run openai-fine-tuning-validate tests/data/dataset-2-multi-turn.jsonl
 Invalid samples:
 
 ```bash
+poetry run openai-fine-tuning-validate tests/data/dataset-3-invalid-json.jsonl
+# => 
+# JSON decode errors found:
+# Line 1: Expecting ',' delimiter: line 1 column 373 (char 372)
+# Line 2: Expecting value: line 1 column 323 (char 322)
+```
+
+```bash
 echo '{}' >> invalid.jsonl
 poetry run openai-fine-tuning-validate invalid.jsonl
 # => {'missing_messages_list': 1}
