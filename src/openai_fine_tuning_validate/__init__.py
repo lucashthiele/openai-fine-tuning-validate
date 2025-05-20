@@ -14,7 +14,13 @@ import click
 @click.argument("dataset_file", type=click.Path(exists=True), required=True)
 def main(dataset_file: str):
     """Main function"""
-    dataset = load_dataset(dataset_file)
+    dataset, errors = load_dataset(dataset_file)
+
+    if errors:
+        click.echo("JSON decode errors found:", err=True)
+        for err in errors:
+            click.echo(err, err=True)
+        sys.exit(1)
 
     if not dataset:
         click.echo("Dataset is empty", err=True)
@@ -33,11 +39,18 @@ def main(dataset_file: str):
     click.echo("Dataset is valid")
 
 
-def load_dataset(dataset_file: str) -> list[dict]:
-    """Load a dataset from a file."""
+def load_dataset(dataset_file: str) -> tuple[list[dict], list[str]]:
     dataset_lines = Path(dataset_file).read_text(encoding="utf-8").splitlines()
-    dataset = [json.loads(line) for line in dataset_lines]
-    return dataset
+    dataset = []
+    errors = []
+    for idx, line in enumerate(dataset_lines, start=1):
+        try:
+            obj = json.loads(line)
+            obj["_line_number"] = idx
+            dataset.append(obj)
+        except json.JSONDecodeError as e:
+            errors.append(f"Line {idx}: {e}")
+    return dataset, errors
 
 
 def validate_dataset(dataset: list[dict]) -> dict[str, int]:

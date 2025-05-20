@@ -11,12 +11,16 @@ DATA_DIR = Path(__file__).resolve().parent / "data"
 
 class Test_validate_dataset:
     def test_simple_dataset_valid(self):
-        dataset = load_dataset(DATA_DIR / "dataset-1-simple.jsonl")
+        dataset, errors = load_dataset(DATA_DIR / "dataset-1-simple.jsonl")
         assert validate_dataset(dataset) == {}
 
     def test_multi_turn_dataset_valid(self):
-        dataset = load_dataset(DATA_DIR / "dataset-2-multi-turn.jsonl")
+        dataset, errors = load_dataset(DATA_DIR / "dataset-2-multi-turn.jsonl")
         assert validate_dataset(dataset) == {}
+
+    def test_json_dataset_invalid(self):
+        dataset, errors = load_dataset(DATA_DIR / "dataset-3-invalid-json.jsonl")
+        assert errors
 
     @pytest.mark.skip()
     def test_empty_invalid(self): ...
